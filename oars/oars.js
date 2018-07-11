@@ -22,13 +22,13 @@ let tableColumns = [
     'Desc']
     .concat(conversionTypes);
 
-let oarURL = 'http://files.misterblue.com/BasilTest/convoar/';
+let baseURL = 'http://files.misterblue.com/BasilTest/convoar/';
 
 $(document).ready(() => {
-    DebugLog('Fetching ' + oarURL + 'index.json');
+    DebugLog('Fetching ' + baseURL + 'index.json');
     $.ajax({
         dataType: 'json',
-        url: oarURL + 'index.json',
+        url: baseURL + 'index.json',
         success: data => {
             BuildTable(data);
         },
@@ -73,15 +73,36 @@ function BuildTable(data) {
         let firstData = [];
         firstData.push(makeDiv(oar, 'c-oarName'));
         if (data[oar].oar) {
-            firstData.push(makeLink(oarURL + oar + '/' + data[oar].oar, makeButtonSmall('OAR')));
+            firstData.push(makeLink(baseURL + oar + '/' + data[oar].oar, makeButtonSmall('OAR')));
         }
         if (data[oar].image) {
-            firstData.push(makeImage(oarURL + oar + '/' + data[oar].image, 'c-oarImage'));
+            firstData.push(makeImage(baseURL + oar + '/' + data[oar].image, 'c-oarImage'));
         }
         cols.push(makeData(firstData, 'c-col-name'));
 
         if (data[oar].desc) {
-            cols.push(makeData(makeText(data[oar].desc, 'c-col-desc')));
+            if (data[oar].desc.endsWith('.html')) {
+                // If the description is an html file, we put a div that will
+                //    be filled when the fetch of the contents is complete.
+                let descTag = oar + '-desc';
+                let descDiv = makeDiv();
+                descDiv.setAttribute('id', descTag);
+                cols.push(makeData(descDiv, 'c-col-desc');
+                $.ajax({
+                    dataType: 'html',
+                    url: baseURL + oar + '/' + data[oar].desc,
+                    success: data => {
+                        $('#' + descTag).empty().append(data);
+                    },
+                    error: e => {
+                        $('#' + descTag).empty().makeText('Failure fetching ' + data[oar].desc);
+                    }
+                });
+            }
+            else {
+                // The description is just a text string
+                cols.push(makeData(makeText(data[oar].desc, 'c-col-desc')));
+            }
         }
         else {
             cols.push(makeData(makeText('.', 'c-col-desc')));
@@ -142,10 +163,10 @@ function makeDataSelection(typeDesc, type, oar) {
     let downloadDivContents = [];
     downloadDivContents.push(makeDiv('Download:'));
     if (typeDesc.tgz) {
-        downloadDivContents.push(makeLink(oarURL + oar + '/' + type + '/' + typeDesc.tgz, makeButtonSmall('TGZ')));
+        downloadDivContents.push(makeLink(baseURL + oar + '/' + type + '/' + typeDesc.tgz, makeButtonSmall('TGZ')));
     }
     if (typeDesc.zip) {
-        downloadDivContents.push(makeLink(oarURL + oar + '/' + type + '/' + typeDesc.zip, makeButtonSmall('ZIP')));
+        downloadDivContents.push(makeLink(baseURL + oar + '/' + type + '/' + typeDesc.zip, makeButtonSmall('ZIP')));
     }
     selectionContents.push(makeDiv(downloadDivContents, 'c-downloads'));
 
