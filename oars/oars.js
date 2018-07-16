@@ -87,7 +87,7 @@ function BuildTable(data) {
                 let descTag = oar + '-desc';
                 let descDiv = makeDiv();
                 descDiv.setAttribute('id', descTag);
-                cols.push(makeData(descDiv, 'c-col-desc');
+                cols.push(makeData(descDiv, 'c-col-desc'));
                 $.ajax({
                     dataType: 'html',
                     url: baseURL + oar + '/' + data[oar].desc,
