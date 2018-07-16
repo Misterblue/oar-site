@@ -5,11 +5,11 @@ HERE=$(pwd)
 # whether to delete the target directory before trying to build
 DOCLEAN=no
 # whether to build
-DOBUILD=yes
+DOBUILD=no
 # whether to generate the JSON index of the directories
 GENINDEX=yes
 # whether to copy the directories to the servers
-DOCOPY=no
+DOCOPY=yes
 
 # if set to 'yes', will attempt to run the docker version of convoar
 USEDOCKER=yes
@@ -85,8 +85,10 @@ for OAR in $OARS ; do
 
         # put a copy of the original OAR into the built tree
         cd "$HERE"
-        echo "======= copying $OAR to convoar/${BASENAME}"
-        cp "$OARPLACE/$OAR" convoar/${BASENAME}
+        if [[ ! -e "convoar/${BASENAME}/${OAR}" ]] ; then
+            echo "======= copying $OAR to convoar/${BASENAME}"
+            cp "$OARPLACE/$OAR" convoar/${BASENAME}
+        fi
 
         # Add a JPG of the OAR file to the build tree if it exists
         if [[ -e "$OARPLACE/${BASENAME}.jpg" ]] ; then
@@ -95,6 +97,10 @@ for OAR in $OARS ; do
         # Add a description of the OAR file to the build tree if it exists
         if [[ -e "$OARPLACE/${BASENAME}.txt" ]] ; then
             cp "$OARPLACE/${BASENAME}.txt" "convoar/${BASENAME}"
+        fi
+        # Add a description of the OAR file to the build tree if it exists
+        if [[ -e "$OARPLACE/${BASENAME}.html" ]] ; then
+            cp "$OARPLACE/${BASENAME}.html" "convoar/${BASENAME}"
         fi
 
         DIR="convoar/${BASENAME}/$SUBDIR"

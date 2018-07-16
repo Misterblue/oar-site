@@ -1,6 +1,6 @@
 #! /bin/bash
 
-HERE=$(PWD)
+HERE=$(pwd)
 
 cd "$HERE"
 cd convoar
