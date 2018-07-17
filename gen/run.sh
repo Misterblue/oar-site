@@ -5,14 +5,14 @@ HERE=$(pwd)
 # whether to delete the target directory before trying to build
 DOCLEAN=no
 # whether to build
-DOBUILD=no
+DOBUILD=yes
 # whether to generate the JSON index of the directories
 GENINDEX=yes
 # whether to copy the directories to the servers
-DOCOPY=yes
+DOCOPY=no
 
 # if set to 'yes', will attempt to run the docker version of convoar
-USEDOCKER=yes
+USEDOCKER=no
 
 CONVOAR=$HERE/../../convoar/dist/convoar.exe
 OARPLACE=../../oar-site-oars
@@ -124,7 +124,7 @@ for OAR in $OARS ; do
                 if [[ "$USEDOCKER" == "yes" ]] ; then
                     cp "../$OAR" .
                     # run the docker app using the UID of the current user so they can access directory
-                    docker run --user $(id -u) --volume $(pwd):/oar herbal3d/convoar:latest "$PARAMS" "$OAR"
+                    docker run --user $(id -u):$(id -g) --volume $(pwd):/oar herbal3d/convoar:latest "$PARAMS" "$OAR"
                     rm -f "$OAR"
                 else
                     $CONVOAR  $PARAMS "../$OAR"
