@@ -3,7 +3,7 @@
 HERE=$(pwd)
 
 # whether to delete the target directory before trying to build
-DOCLEAN=no
+DOCLEAN=yes
 # whether to build
 DOBUILD=yes
 # whether to generate the JSON index of the directories
@@ -22,17 +22,17 @@ OARPLACE=../../oar-site-oars
 # PROCESSING="MERGEDMATERIALS"
 PROCESSING="UNOPTIMIZED SMALLASSETS MERGEDMATERIALS"
 
-if [[ -z "$MB_REMOTEACCT" || -z "$MB_REMOTEHOST" ]] ; then
+if [[ ( "$DOCOPY" == "yes" ) && ( -z "$MB_REMOTEACCT" || -z "$MB_REMOTEHOST" ) ]] ; then
     echo "Cannot run script without MB_REMOTEACCT and MB_REMOTEHOST environment variables set"
     exit
 fi
 REMOTEACCT=${MB_REMOTEACCT:-mb}
 REMOTEHOST=${MB_REMOTEHOST:-someplace.misterblue.com}
+REMOTEBASE=files.misterblue.com/BasilTest
 
 DOVERBOSE=""
 # DOVERBOSE="--Verbose"
 
-REMOTEBASE=files.misterblue.com/BasilTest
 
 OARS=""
 # OARS="$OARS testtest88.oar"
@@ -57,9 +57,12 @@ OARS=""
 # OARS="$OARS WinterLand.oar"
 # OARS="$OARS Fantasy.oar"
 # OARS="$OARS ZadarooSwamp.oar"
+OARS="$OARS opensim-openvce.oar"
 
 cd "$HERE"
 cd "$OARPLACE"
+# This defines the list of OARs to build as the contents of the directory of OARs.
+# Comment out this line to manually specify OAR names (the list above).
 OARS=$(ls *.oar)
 cd "$HERE"
 

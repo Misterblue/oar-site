@@ -1,0 +1,134 @@
+.defn-dialog {
+  margin: 5px;
+  padding: 5px;
+  border-radius: 1em;
+  -moz-border-radius: 1em;
+  color: #dd2;
+  background: #11455f;
+  opacity: 0.8;
+}
+.defn-dialogBlock {
+  display: block;
+  border: 2px solid #e3e9d2;
+  background: #88d498;
+  margin: 4px;
+  padding: 4px;
+}
+.defn-button {
+  display: inline;
+  margin: 4px;
+  padding: 2px;
+  text-align: center;
+  border: 3px solid #e3e9d2;
+  border-radius: 5px;
+  -moz-border-radius: 5px;
+  color: #11455f;
+  background: #c6dabf;
+  opacity: 100;
+}
+.defn-display {
+  display: inline;
+  margin: 1px;
+  padding: 2px;
+  border: 1px solid #e3e9d2;
+}
+.button {
+  display: inline;
+  margin: 4px;
+  padding: 2px;
+  text-align: center;
+  border: 3px solid #e3e9d2;
+  border-radius: 5px;
+  -moz-border-radius: 5px;
+  color: #11455f;
+  background: #c6dabf;
+  opacity: 100;
+  width: 7em;
+  height: 2em;
+}
+.button-sm {
+  display: inline;
+  margin: 4px;
+  padding: 2px;
+  text-align: center;
+  border: 3px solid #e3e9d2;
+  border-radius: 5px;
+  -moz-border-radius: 5px;
+  color: #11455f;
+  background: #c6dabf;
+  opacity: 100;
+  width: 5em;
+  font-size: smaller;
+}
+a {
+  color: #e3e9d2;
+}
+#c-body {
+  font-family: Veranda, Arial, Helvetica, sans-serif;
+  font-size: 12px;
+  color: #dd2;
+  background: #11455f;
+  padding: 2em;
+  margin: 2em;
+}
+.dialog-group {
+  display: block;
+  border: 2px solid #e3e9d2;
+  background: #88d498;
+  margin: 4px;
+  padding: 4px;
+}
+.c-table {
+  border: 2px solid #e3e9d2;
+}
+.c-table th {
+  font-weight: bold;
+  border: 2px solid #e3e9d2;
+}
+.c-table td {
+  border: 2px solid #e3e9d2;
+}
+.c-oarName {
+  display: inline;
+}
+.c-oarImage {
+  display: block;
+  width: 200px;
+}
+label {
+  display: block;
+}
+.textDisplay {
+  display: inline;
+  margin: 1px;
+  padding: 2px;
+  border: 1px solid #e3e9d2;
+  border: 0px;
+}
+.coordDisplay {
+  display: inline;
+  margin: 1px;
+  padding: 2px;
+  border: 1px solid #e3e9d2;
+}
+.coordEntry {
+  display: inline;
+  margin: 1px;
+  background: #c6dabf;
+}
+#DEBUGG {
+  margin: 5px;
+  padding: 5px;
+  border-radius: 1em;
+  -moz-border-radius: 1em;
+  color: #dd2;
+  background: #11455f;
+  opacity: 0.8;
+  color: #111;
+  background: #88d498;
+  opacity: 0.6;
+}
+.c-errorMsg {
+  color: #ff2020;
+  font-weight: heavy;
+}

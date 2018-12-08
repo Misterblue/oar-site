@@ -24,6 +24,7 @@ let tableColumns = [
 
 let baseURL = 'http://files.misterblue.com/BasilTest/convoar/';
 
+// When document is ready, read the table defining 'index.json' and built the table.
 $(document).ready(() => {
     DebugLog('Fetching ' + baseURL + 'index.json');
     $.ajax({
@@ -38,6 +39,7 @@ $(document).ready(() => {
     });
 });
 
+// Place a message in a scrolling debug area. Not for general user communication.
 function LogMessage(msg, aClass) {
     if ($('#DEBUGG')) {
         if (aClass)
@@ -57,6 +59,36 @@ function ErrorLog(msg) {
     LogMesssage(msg, 'c-errorMsg');
 };
 
+// Build the OAR display table.
+// Input data is:
+// {
+// OARBaseName: {
+//     "oar": "OARFileName",
+//     "image": "optionalImageFilename",
+//     "desc": "optionalDescriptionTXTorHTMLFilename",
+//     "types": {
+//         "unoptimized": {
+//             "gltf": "GLTFFilename",
+//             "zip": "optionalZIPFilename",
+//             "tgz": "optionalTGZFilename"
+//         },
+//         "smallassets": {
+//             "gltf": "GLTFFilename",
+//             "zip": "optionalZIPFilename",
+//             "tgz": "optionalTGZFilename"
+//         },
+//         "mergedmaterials": {
+//             "gltf": "GLTFFilename",
+//             "zip": "optionalZIPFilename",
+//             "tgz": "optionalTGZFilename"
+//         }
+//     }
+// },
+// AnotherOARBaseName: {
+//     ...
+// },
+// ...
+// }
 function BuildTable(data) {
     let rows = [];
 
@@ -230,6 +262,13 @@ function makeText(contents) {
     return tex;
 };
 
+// Make a DOM element of 'type'.
+// If 'contents' is:
+//       undefined: don't add any contents to the created element
+//       an array: append multiple children
+//       a string: append a DOM text element containing the string
+//       otherwise: append 'contents' as a child
+// If 'aClass' is defined, add a 'class' attribute to the created DOM element
 function makeElement(type, contents, aClass) {
     let elem = document.createElement(type);
     if (aClass) {
