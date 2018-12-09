@@ -22,7 +22,7 @@ let tableColumns = [
     'Desc']
     .concat(conversionTypes);
 
-let baseURL = 'http://files.misterblue.com/BasilTest/convoar/';
+let baseURL = 'https://files.misterblue.com/BasilTest/convoar/';
 
 // When document is ready, read the table defining 'index.json' and built the table.
 $(document).ready(() => {
