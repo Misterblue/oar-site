@@ -10,44 +10,60 @@
 // limitations under the License.
 
 // Create OAR file display page
-//
-let conversionTypes = [
+
+const VERSION = '2.0.3';
+
+const conversionTypes = [
     'unoptimized',
     'smallassets',
     'mergedmaterials'
 ];
 
-let tableColumns = [
+const tableColumns = [
     'OAR file',
     'Desc']
     .concat(conversionTypes);
 
 let baseURL = 'https://files.misterblue.com/BasilTest/convoar/';
+// let viewURL = 'https://misterblue.com/justview/justview.html';
+let viewURL = 'https://herbal3d.org/basil/JustView.html';
 
-// When document is ready, read the table defining 'index.json' and built the table.
-$(document).ready(() => {
+// When document is ready, read the table defining 'index.json' and build the table.
+window.onload = function() {
+    LogMessage('Version ' + VERSION);
+
     DebugLog('Fetching ' + baseURL + 'index.json');
-    $.ajax({
-        dataType: 'json',
-        url: baseURL + 'index.json',
-        success: data => {
-            BuildTable(data);
-        },
-        error: e => {
-            BuildErrorTable(e);
+    fetch(baseURL + 'index.json')
+    .then( response => {
+        if (response.ok) {
+            return response.json();
         }
+        throw new Error(response.status);
+    })
+    .then( data => {
+        BuildTable(data)
+    })
+    .catch( () => {
+        BuildErrorTable(response.status);
     });
-});
+};
 
 // Place a message in a scrolling debug area. Not for general user communication.
-function LogMessage(msg, aClass) {
-    if ($('#DEBUGG')) {
-        if (aClass)
-            $('#DEBUGG').append('<div class="' + aClass + '">' + msg + '</div');
-        else
-            $('#DEBUGG').append('<div>' + msg + '</div');
-        if ($('#DEBUGG').children().length > 20)
-            $('#DEBUGG').children('div:first').remove();
+function LogMessage(pMsg, pClass) {
+    const debugNode = document.getElementById('DEBUGG');
+    if (debugNode) {
+        const newLine = document.createElement('div');
+        newLine.appendChild(document.createTextNode(pMsg));
+        if (pClass) {
+            newLine.setAttribute('class', pClass);
+        };
+        debugNode.appendChild(newLine);
+        while (debugNode.childElementCount > 20) {
+            debugNode.removeChild(debugNode.firstChild);
+        };
+    }
+    else {
+        console.log('DEBUGG:' + msg);
     }
 };
 
@@ -101,61 +117,74 @@ function BuildTable(data) {
 
     // For each OAR file, create row of description and converted forms
     Object.keys(data).forEach( oar => {
+        const entry = data[oar];
+
+        // Columns being created for this entry
         let cols = [];
+
+        // First column created in 'firstData' 
         let firstData = [];
         firstData.push(makeDiv(oar, 'c-oarName'));
-        if (data[oar].oar) {
-            firstData.push(makeLink(baseURL + oar + '/' + data[oar].oar, makeButtonSmall('OAR')));
+        if (entry.oar) {
+            firstData.push(makeLink(baseURL + oar + '/' + entry.oar, makeButtonSmall('OAR')));
         }
-        if (data[oar].image) {
-            firstData.push(makeImage(baseURL + oar + '/' + data[oar].image, 'c-oarImage'));
+        if (entry.image) {
+            firstData.push(makeImage(baseURL + oar + '/' + entry.image, 'c-oarImage'));
         }
         cols.push(makeData(firstData, 'c-col-name'));
 
-        if (data[oar].desc) {
-            if (data[oar].desc.endsWith('.html')) {
+        // Create second column with description info
+        if (entry.desc) {
+            if (entry.desc.endsWith('.html')) {
                 // If the description is an html file, we put a div that will
                 //    be filled when the fetch of the contents is complete.
                 let descTag = oar + '-desc';
                 let descDiv = makeDiv();
                 descDiv.setAttribute('id', descTag);
                 cols.push(makeData(descDiv, 'c-col-desc'));
-                $.ajax({
-                    dataType: 'html',
-                    url: baseURL + oar + '/' + data[oar].desc,
-                    success: data => {
-                        $('#' + descTag).empty().append(data);
-                    },
-                    error: e => {
-                        $('#' + descTag).empty().makeText('Failure fetching ' + data[oar].desc);
+
+                const descURL = baseURL + oar + '/' + entry.desc;
+                fetch(descURL)
+                .then(response => {
+                    if (response.ok) {
+                        return response.text();
                     }
+                    throw new Error(response.status);
+                })
+                .then( descText => {
+                    descDiv.innerHTML = descText;
+                })
+                .catch(e => {
+                    descDiv.append(makeText(`Failure fetching ${entry.desc}: ${e}`));
                 });
             }
             else {
                 // The description is just a text string
-                cols.push(makeData(makeText(data[oar].desc, 'c-col-desc')));
+                cols.push(makeData(makeText(entry.desc, 'c-col-desc')));
             }
         }
         else {
             cols.push(makeData(makeText('.', 'c-col-desc')));
         }
 
+        // Following columns are for the different conversions of the OAR
         conversionTypes.forEach( conv => {
-            if (data[oar].types[conv]) {
-                cols.push(makeDataSelection(data[oar].types[conv], conv, oar));
+            if (entry.types[conv]) {
+                cols.push(makeDataSelection(entry.types[conv], conv, oar));
             }
             else {
                 cols.push(makeData('.'));
             }
         });
 
+        // Entry columns complete. Push into 'rows'
         rows.push(makeRow(cols));
     });
-    $('#c-tableplace').empty().append(makeTable(rows, 'c-table'));
+    document.getElementById('c-tableplace').replaceChildren(makeTable(rows, 'c-table'));
 };
 
 function BuildErrorTable(e) {
-    $('#c-tableplace').empty().append(makeText('Could not load OAR index file'));
+    document.getElementById('c-tableplace').replaceChildren(makeText('Could not load OAR index file'));
 };
 
 // Return a table data element containing everything about this type version of the oar
@@ -185,8 +214,8 @@ function makeDataSelection(typeDesc, type, oar) {
 
     let viewDivContents = [];
     if (typeDesc.gltf) {
-        let viewURL = 'https://misterblue.com/justview/justview.html?b=' + oar + '&v=' + type;
-        let viewLink = makeLink(viewURL, makeButton('View'));
+        let viewerURL = viewURL + '?b=' + oar + '&v=' + type;
+        let viewLink = makeLink(viewerURL, makeButton('View'));
         viewLink.setAttribute('target', '_blank');
         viewDivContents.push(makeDiv(viewLink, 'c-viewer'));
     }
@@ -269,6 +298,7 @@ function makeText(contents) {
 //       a string: append a DOM text element containing the string
 //       otherwise: append 'contents' as a child
 // If 'aClass' is defined, add a 'class' attribute to the created DOM element
+// Returns the created element
 function makeElement(type, contents, aClass) {
     let elem = document.createElement(type);
     if (aClass) {

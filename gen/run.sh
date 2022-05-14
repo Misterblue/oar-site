@@ -3,7 +3,7 @@
 HERE=$(pwd)
 
 # whether to delete the target directory before trying to build
-DOCLEAN=yes
+DOCLEAN=no
 # whether to build
 DOBUILD=yes
 # whether to generate the JSON index of the directories
@@ -21,6 +21,7 @@ OARPLACE=../../oar-site-oars
 # PROCESSING="SMALLASSETS"
 # PROCESSING="MERGEDMATERIALS"
 PROCESSING="UNOPTIMIZED SMALLASSETS MERGEDMATERIALS"
+# PROCESSING="UNOPTIMIZED SMALLASSETS"
 
 if [[ ( "$DOCOPY" == "yes" ) && ( -z "$MB_REMOTEACCT" || -z "$MB_REMOTEHOST" ) ]] ; then
     echo "Cannot run script without MB_REMOTEACCT and MB_REMOTEHOST environment variables set"
@@ -32,7 +33,6 @@ REMOTEBASE=files.misterblue.com/BasilTest
 
 DOVERBOSE=""
 # DOVERBOSE="--Verbose"
-
 
 OARS=""
 # OARS="$OARS testtest88.oar"
@@ -57,7 +57,7 @@ OARS=""
 # OARS="$OARS WinterLand.oar"
 # OARS="$OARS Fantasy.oar"
 # OARS="$OARS ZadarooSwamp.oar"
-OARS="$OARS opensim-openvce.oar"
+# OARS="$OARS Olaf.oar"
 
 cd "$HERE"
 cd "$OARPLACE"
@@ -82,6 +82,7 @@ for OAR in $OARS ; do
             SUBDIR=mergedmaterials
         fi
         # PARAMS="$PARAMS --logGltfBuilding --verbose --LogBuilding --LogConversionStats"
+        PARAMS="$PARAMS --OutputDir ."
 
         cd "$HERE"
         mkdir -p convoar/${BASENAME}
@@ -127,11 +128,16 @@ for OAR in $OARS ; do
                 if [[ "$USEDOCKER" == "yes" ]] ; then
                     cp "../$OAR" .
                     # run the docker app using the UID of the current user so they can access directory
+                    echo "DOING: docker run --user $(id -u):$(id -g) --volume $(pwd):/oar ghcr.io/misterblue/convoar:latest \"$PARAMS\" \"$OAR\""
                     docker run --user $(id -u):$(id -g) --volume $(pwd):/oar herbal3d/convoar:latest "$PARAMS" "$OAR"
                     rm -f "$OAR"
                 else
                     $CONVOAR  $PARAMS "../$OAR"
                 fi
+                # Create a gltf files that has the name of the OAR file
+                cd "$HERE"
+                cd "$DIR"
+                cp *.gltf ${BASENAME}.gltf
                 # Create a single TGZ file with all the content for the 3DWebWorldz people
                 cd "$HERE"
                 cd "$DIR"
@@ -163,6 +169,11 @@ if [[ "$DOCOPY" == "yes" ]] ; then
         rsync -r -v --delete-after convoar "basil@nyxx:basil-git/Basiljs"
     fi
     echo "======= copying convoar to misterblue"
+    for OAR in $OARS ; do
+        BASENAME="$(basename -s .oar $OAR)"
+        cd "$HERE"
+        rsync -r -v --delete-after "convoar/$BASENAME" "${REMOTEACCT}@${REMOTEHOST}:${REMOTEBASE}/convoar"
+    done
     cd "$HERE"
-    rsync -r -v --delete-after convoar "${REMOTEACCT}@${REMOTEHOST}:$REMOTEBASE"
+    rsync -v "convoar/index.json" "${REMOTEACCT}@${REMOTEHOST}:${REMOTEBASE}/convoar"
 fi
