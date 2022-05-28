@@ -154,7 +154,7 @@ for OAR in $OARS ; do
                     cp "../$OAR" .
                     # run the docker app using the UID of the current user so they can access directory
                     echo "DOING: docker run --user $(id -u):$(id -g) --volume $(pwd):/oar ghcr.io/misterblue/convoar:latest \"$PARAMS\" \"$OAR\""
-                    docker run --user $(id -u):$(id -g) --volume $(pwd):/oar herbal3d/convoar:latest "$PARAMS" "$OAR"
+                    docker run --user $(id -u):$(id -g) --volume $(pwd):/oar ghcr.io/misterblue/convoar:latest "$PARAMS" "$OAR"
                     rm -f "$OAR"
                 else
                     $CONVOAR  $PARAMS "../$OAR"
