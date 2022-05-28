@@ -170,7 +170,8 @@ for OAR in $OARS ; do
                 # Create a single ZIP file with all the content for the 3DWebWorldz people
                 cd "$HERE"
                 cd "$DIR"
-                zip -r -q ${BASENAME} *.gltf *.buf images
+                # zip -r -q ${BASENAME} *.gltf *.buf *.png *.jpg
+                zip -r -q ${BASENAME} *
             else
                 echo "======= not building $DIR: already exists"
             fi
